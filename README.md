@@ -44,10 +44,10 @@ nano index.html;
       window.TrackerQb = (typeof TQb==='object')? TQb : {};
 
       window.TrackerQb.on('backoffice-connections', function (message) {
-        console.log('backoffice-connections',  message)
+        console.log('backoffice-connections',  message);
       });
       window.TrackerQb.on('backoffice-tracker', function (message) {
-        console.log('backoffice-tracker', message)
+        console.log('backoffice-tracker', message);
       });
     </script>
   </body>
