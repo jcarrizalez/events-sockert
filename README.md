@@ -37,7 +37,7 @@ nano index.html;
 ```bash
 nano index.html;
   <head>
-    <script console="true" src="https://events.stage.qubit.tv/?tracker=BAC-QDFGREE">
+    <script console="true" src="https://events.stage.qubit.tv/?tracker=BAC-QDFGREE"></script>
   </head>
   <body>
     <script>
