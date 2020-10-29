@@ -32,3 +32,23 @@ nano index.html;
   </body>
 ```
 
+
+## BACKOFFICE-FRONTEND
+```bash
+nano index.html;
+  <head>
+    <script console="true" src="https://events.stage.qubit.tv/?tracker=BAC-QDFGREE">
+  </head>
+  <body>
+    <script>
+      window.TrackerQb = (typeof TQb==='object')? TQb : {};
+
+      window.TrackerQb.on('backoffice-connections', function (message) {
+        console.log('backoffice-connections',  message)
+      });
+      window.TrackerQb.on('backoffice-tracker', function (message) {
+        console.log('backoffice-tracker', message)
+      });
+    </script>
+  </body>
+```
