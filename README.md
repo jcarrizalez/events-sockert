@@ -9,11 +9,11 @@ npm install;
 ## SERVER-CONFIG
 ```bash
 nano .env;
-	PORT=9015
-	API_KEY=*************
-	API_URL=*************
-	API_SECRET=**********
-	API_VERSION=*********
+  PORT=9015
+  API_KEY=*************
+  API_URL=*************
+  API_SECRET=**********
+  API_VERSION=*********
 ```
 ## SERVER-START
 ```bash
@@ -21,14 +21,14 @@ node server.js;
 ```
 ## CLIENT-FRONTEND
 ```bash
-	nano index.html;
-	<head>
-		<script console="false" src="https://events.stage.qubit.tv/?tracker=WEB-RDEWFQS"></script>
-	</head>
-	<body>
-      	<script>
-        	window.TrackerQb = event => (typeof TQb==='function')? TQb(event) : null;
-	    </script>
-	</body>
+nano index.html;
+  <head>
+    <script console="false" src="https://events.stage.qubit.tv/?tracker=WEB-RDEWFQS"></script>
+  </head>
+  <body>
+    <script>
+      window.TrackerQb = event => (typeof TQb==='function')? TQb(event) : null;
+    </script>
+  </body>
 ```
 
