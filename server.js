@@ -8,7 +8,7 @@ dotenv.config();
 
 ['PORT', 'API_KEY', 'API_URL', 'API_SECRET', 'API_VERSION'].forEach( (item, key ) => {
     if(process.env[item]===undefined){
-        throw new Error(`{item} at .env is require`);
+        throw new Error(`${item} at .env is require`);
     } 
 });
 
@@ -252,4 +252,6 @@ function api_post_events_register(register){
         }
     });
 }
-server.listen(process.env.PORT);
+server.listen(process.env.PORT, () => {
+    console.log(`Sever events stated on PORT: ${process.env.PORT}`);
+});

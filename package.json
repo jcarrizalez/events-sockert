@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "serve": "nodejs server.js",
-    "build": "echo 'hello build'"
+    "serve": "node server.js",
+    "build": "echo 'hello build'",
+    "start:pm2": "pm2 start server.js -n server-events",
+    "stop:pm2": "pm2 stop server-events"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
     "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
+    "pm2": "^4.5.5",
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
     "url": "^0.11.0"
