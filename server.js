@@ -228,7 +228,7 @@ function api_post_auth(register){
             api_post_events_register(register);
         }
         else{
-            console.log('error');
+            console.log('auth service: ', body);
         }
     });
 }
@@ -248,7 +248,7 @@ function api_post_events_register(register){
             console.log('data-register');
         }
         else{
-           console.log('error');
+           console.log('events-register service: ', body);
         }
     });
 }
