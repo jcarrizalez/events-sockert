@@ -32,6 +32,15 @@ nano index.html;
   </body>
 ```
 
+## CLIENT-FRONTEND-EXAMPLE
+```bash
+  window.TrackerQb({
+    type:'error_javascript',
+    user_id: 123456,
+    profile_id: 654321,
+    path: '/inicio'
+  });
+```
 
 ## BACKOFFICE-FRONTEND
 ```bash
