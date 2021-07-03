@@ -1,0 +1,116 @@
+<?php
+
+namespace Qubit\Core\Http\Controllers;
+
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Http\Request;
+use Qubit\Core\GeoIP\GeoIP;
+use Cache;
+
+/**
+ * @group Core
+ *
+ */
+class CoreController extends BaseController
+{
+	public function eventsRegister(Request $request)
+	{
+		$events = \DB::connection('events_log');
+
+		$agents = $request->get('agents', []);
+		$origins = $request->get('origins', []);
+		$tracker = $request->get('tracker', []);
+		
+		$events_key = 'events_log_51';
+		$cache = (object)[
+			'agents' => Cache::get($events_key.'agents')?? [],
+			'origins' => Cache::get($events_key.'origins')?? [],
+			'countries' => Cache::get($events_key.'countries')?? [],
+			'sessions' => Cache::get($events_key.'sessions')?? [],
+			'address' => Cache::get($events_key.'address')?? [],
+			'events_type' => Cache::get($events_key.'events_type')?? [],
+			'dates' => Cache::get($events_key.'dates')?? [],
+		];
+
+		$cache_put = static function($table, $select) use (&$cache, $events, $events_key){
+
+    		$res = $events->table($table)->select('id','name')->whereIn('name', $select)->get();
+			foreach ($res as $key => $value) {
+				$cache->{$table}[str_slug($value->name,'')] = $value->id;
+				unset($select[str_slug($value->name,'')]);
+			}
+			Cache::put($events_key.$table, $cache->{$table}, now()->addMinutes(120));
+			return $select;
+		};
+	    
+		foreach ($agents as $agent) {
+			$agents[$agent['id']] = $agent['name'];
+		}
+
+		foreach ($origins as $origin) {
+			$origins[$origin['id']] = $origin['name'];
+		}
+
+		$tables = static function(){
+			return (object)[ 'agents'=> [], 'origins'=> [], 'countries'=> [], 'events_type'=> [], 'sessions'=> [], 'address'=> [], 'dates'=> [] ];
+		};
+
+		$reg_ca = $tables();
+		$reg_bd = $tables();
+		
+		$valid = static function($table, $value) use (&$reg_ca){
+			if(!in_array($value, $reg_ca->{$table})) $reg_ca->{$table}[] = $value;
+		};
+
+		foreach ($tracker['rows'] as $key => $item) {
+			$valid('events_type', $item[0]);
+			$valid('sessions', $item[1]);
+			$valid('address', $item[2]);
+			$valid('agents', $agents[$item[3]]);
+			$valid('origins', $origins[$item[4]]);
+			$valid('dates', $item[6]);
+			$geo_ip = GeoIP::info($item[2]);
+			$tracker['rows'][$key][7] = $geo_ip->country?? 'Unrecognized';
+			$valid('countries', $tracker['rows'][$key][7] );
+		}
+
+		foreach ($reg_ca as $table => $rows) {
+			foreach ($rows as $item) {
+				if(!isset($cache->{$table}[str_slug($item,'')]) && !isset($reg_bd->{$table}[str_slug($item,'')])){
+					$reg_bd->{$table}[str_slug($item,'')] = $item;
+				}
+			}
+		}
+		
+		foreach ($reg_bd as $table => $rows) {
+
+			if(count($rows)>0){
+				$rows = $cache_put($table, $rows);
+				if(count($rows)>0){
+					$insert = [];
+					foreach ($rows as $value) {
+						$insert[] = ['name' => $value];
+					}
+					$events->table($table)->insert( $insert );
+				}
+				$cache_put($table, $rows);
+			}
+		}
+
+		foreach ($tracker['rows'] as &$item) {
+			$item = [
+				'event_type_id' => $cache->events_type[str_slug($item[0],'')],
+				'address_id' => $cache->address[str_slug($item[2],'')],
+				'country_id' => $cache->countries[str_slug($item[7],'')],
+				'agent_id' => $cache->agents[str_slug($agents[$item[3]],'')],
+				'origin_id' => $cache->origins[str_slug($origins[$item[4]],'')],
+				'session_id' => $cache->sessions[str_slug($item[1],'')],
+				'date_id' => $cache->dates[str_slug($item[6],'')],
+				'data' => json_encode( (is_array($item[5]) && count($item[5])===0)? null : $item[5]) ,
+			];
+		}
+
+		$events->table('events')->insert( $tracker['rows'] );
+		return jsend_success( true );
+	}
+}
